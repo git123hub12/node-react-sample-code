@@ -11,7 +11,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
@@ -19,13 +19,22 @@ jobs:
       - name: Log in to Amazon ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
-        
+        env:
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
       - name: Build and Push Docker Image to ECR
+        env:
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+          ECR_REPOSITORY_URI: ${{ secrets.ECR_REPOSITORY_URI }}
         run: |
           docker build -t myapp .
-          docker tag myapp:latest public.ecr.aws/f0p0a6z6/docker-1.amazonaws.com/node-react-sample-code-backend:latest
-          docker push public.ecr.aws/f0p0a6z6/docker-1.amazonaws.com/node-react-sample-code-backend:latest
+          docker tag myapp:latest $ECR_REPOSITORY_URI:latest
+          docker push $ECR_REPOSITORY_URI:latest
 
       - name: Deploy to AWS ECS
+        env:
+          AWS_REGION: ${{ secrets.AWS_REGION }}
         run: |
-          aws ecs update-service --cluster Doc-Cluster --service Task-1 --force-new-deployment
+          aws ecs update-service --cluster Doc-Cluster --service Task-1 --force-new-deployment --region $AWS_REGION
