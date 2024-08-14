@@ -20,7 +20,7 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
         with: 
-          region: ${{ secrets.AWS_REGION }}  # Specify the AWS region here
+          region: ${{ us-east-1 }}  # Specify the AWS region here
 
       - name: Build and Push Docker Image to ECR
         run: |
