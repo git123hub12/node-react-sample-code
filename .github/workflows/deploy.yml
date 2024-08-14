@@ -20,7 +20,7 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
         with:
-          region: ${{ us-west-2}} 
+          region: ${{us-west-2}} 
        
           
 
