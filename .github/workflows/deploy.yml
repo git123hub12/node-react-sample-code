@@ -23,13 +23,9 @@ jobs:
       - name: Build and Push Docker Image to ECR
         run: |
           docker build -t myapp .
-          docker tag myapp:latest 123456789012.dkr.ecr.us-west-2.amazonaws.com/myapp:latest
-          docker push 123456789012.dkr.ecr.us-west-2.amazonaws.com/myapp:latest
+          docker tag myapp:latest public.ecr.aws/f0p0a6z6/docker-1.amazonaws.com/node-react-sample-code-backend:latest
+          docker push public.ecr.aws/f0p0a6z6/docker-1.amazonaws.com/node-react-sample-code-backend:latest
 
       - name: Deploy to AWS ECS
         run: |
-          aws ecs update-service --cluster my-cluster --service my-service --force-new-deployment
-
-      - name: Deploy to AWS EC2 (Optional)
-        run: |
-          ssh -i /path/to/your/key.pem ec2-user@your-ec2-ip "docker pull 123456789012.dkr.ecr.us-west-2.amazonaws.com/myapp:latest && docker run -d myapp"
+          aws ecs update-service --cluster Doc-Cluster --service Task-1 --force-new-deployment
