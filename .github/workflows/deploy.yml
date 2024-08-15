@@ -19,31 +19,29 @@ jobs:
       - name: Log in to Amazon ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
-        env:
-          AWS_REGION: ${{ secrets.AWS_REGION }}
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          
+        with:
+          region: ${{ secrets.AWS_REGION }}
+          access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
       - name: List files in directory (for debugging)
         run: ls -la
 
       - name: Build and Push Frontend Docker Image to ECR
         env:
-          AWS_REGION: ${{ secrets.AWS_REGION }}
           ECR_REPOSITORY_URI: ${{ secrets.FRONTEND_ECR_REPOSITORY_URI }}
         run: |
-          docker build -t myrepo/frontend:latest ./frontend
-          docker tag suleimanmohammed/node-react-sample-code-frontend:latest $ECR_REPOSITORY_URI:frontend:latest
-          docker push $ECR_REPOSITORY_URI:frontend-latest
+          docker build -t frontend:latest ./frontend
+          docker tag frontend:latest $ECR_REPOSITORY_URI:latest
+          docker push $ECR_REPOSITORY_URI:latest
 
       - name: Build and Push Backend Docker Image to ECR
         env:
-          AWS_REGION: ${{ secrets.AWS_REGION }}
           ECR_REPOSITORY_URI: ${{ secrets.BACKEND_ECR_REPOSITORY_URI }}
         run: |
-          docker build -t myrepo/backend:latest ./backend
-          docker tag suleimanmohammed/node-react-sample-code-backend:latest $ECR_REPOSITORY_URI:backend:latest
-          docker push $ECR_REPOSITORY_URI:backend-latest
+          docker build -t backend:latest ./backend
+          docker tag backend:latest $ECR_REPOSITORY_URI:latest
+          docker push $ECR_REPOSITORY_URI:latest
 
       - name: Deploy to AWS ECS
         env:
