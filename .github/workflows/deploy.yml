@@ -16,18 +16,16 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
 
-      - name: Log in to Amazon ECR
-        id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v1
-        with:
-          region: ${{ secrets.AWS_REGION }}
-          access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-
-      - name: Check AWS_REGION value
-        run: echo "AWS_REGION is $AWS_REGION"
+      - name: Configure AWS CLI
+        run: |
+          aws configure set region ${{ secrets.AWS_REGION }}
         env:
-          AWS_REGION: ${{ secrets.AWS_REGION }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+      - name: Log in to Amazon ECR
+        run: |
+          aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.ECR_REGISTRY_URI }}
 
       - name: List files in directory (for debugging)
         run: ls -la
@@ -39,6 +37,8 @@ jobs:
           docker push ${{ secrets.FRONTEND_ECR_REPOSITORY_URI }}:latest
         env:
           AWS_REGION: ${{ secrets.AWS_REGION }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
       - name: Build and Push Backend Docker Image to ECR
         run: |
@@ -47,7 +47,13 @@ jobs:
           docker push ${{ secrets.BACKEND_ECR_REPOSITORY_URI }}:latest
         env:
           AWS_REGION: ${{ secrets.AWS_REGION }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
       - name: Deploy to AWS ECS
         run: |
-          aws ecs update-service --cluster Doc-Cluster --service Task-1 --force-new-deployment --region ${{ secrets.AWS_REGION }}.
+          aws ecs update-service --cluster Doc-Cluster --service Task-1 --force-new-deployment --region ${{ secrets.AWS_REGION }}
+        env:
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
