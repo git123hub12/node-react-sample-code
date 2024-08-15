@@ -50,4 +50,4 @@ jobs:
 
       - name: Deploy to AWS ECS
         run: |
-          aws ecs update-service --cluster Doc-Cluster --service Task-1 --force-new-deployment --region us-east-1
+          aws ecs update-service --cluster Doc-Cluster --service Task-1 --force-new-deployment --region ec2:us-east-1
