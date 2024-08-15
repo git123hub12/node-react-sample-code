@@ -24,27 +24,32 @@ jobs:
           access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
+      - name: Check AWS_REGION value
+        run: echo "AWS_REGION is $AWS_REGION"
+        env:
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+
       - name: List files in directory (for debugging)
         run: ls -la
 
       - name: Build and Push Frontend Docker Image to ECR
-        env:
-          ECR_REPOSITORY_URI: ${{ secrets.FRONTEND_ECR_REPOSITORY_URI }}
         run: |
           docker build -t frontend:latest ./frontend
-          docker tag frontend:latest $ECR_REPOSITORY_URI:latest
-          docker push $ECR_REPOSITORY_URI:latest
-
-      - name: Build and Push Backend Docker Image to ECR
-        env:
-          ECR_REPOSITORY_URI: ${{ secrets.BACKEND_ECR_REPOSITORY_URI }}
-        run: |
-          docker build -t backend:latest ./backend
-          docker tag backend:latest $ECR_REPOSITORY_URI:latest
-          docker push $ECR_REPOSITORY_URI:latest
-
-      - name: Deploy to AWS ECS
+          docker tag frontend:latest ${{ secrets.FRONTEND_ECR_REPOSITORY_URI }}:latest
+          docker push ${{ secrets.FRONTEND_ECR_REPOSITORY_URI }}:latest
         env:
           AWS_REGION: ${{ secrets.AWS_REGION }}
+
+      - name: Build and Push Backend Docker Image to ECR
+        run: |
+          docker build -t backend:latest ./backend
+          docker tag backend:latest ${{ secrets.BACKEND_ECR_REPOSITORY_URI }}:latest
+          docker push ${{ secrets.BACKEND_ECR_REPOSITORY_URI }}:latest
+        env:
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+
+      - name: Deploy to AWS ECS
         run: |
           aws ecs update-service --cluster Doc-Cluster --service Task-1 --force-new-deployment --region $AWS_REGION
+        env:
+          AWS_REGION: ${{ secrets.AWS_REGION }}
