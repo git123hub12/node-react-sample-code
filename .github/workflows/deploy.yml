@@ -50,6 +50,4 @@ jobs:
 
       - name: Deploy to AWS ECS
         run: |
-          aws ecs update-service --cluster Doc-Cluster --service Task-1 --force-new-deployment --region $AWS_REGION
-        env:
-          AWS_REGION: ${{ secrets.AWS_REGION }}
+          aws ecs update-service --cluster Doc-Cluster --service Task-1 --force-new-deployment --region us-west-2
