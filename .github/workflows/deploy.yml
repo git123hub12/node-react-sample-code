@@ -33,7 +33,7 @@ jobs:
           ECR_REPOSITORY_URI: ${{ secrets.FRONTEND_ECR_REPOSITORY_URI }}
         run: |
           docker build -t myrepo/frontend:latest ./frontend
-          docker tag suleimanmohammed/node-react-sample-code-frontend:latest $ECR_REPOSITORY_URI:frontend-latest
+          docker tag suleimanmohammed/node-react-sample-code-frontend:latest $ECR_REPOSITORY_URI:frontend:latest
           docker push $ECR_REPOSITORY_URI:frontend-latest
 
       - name: Build and Push Backend Docker Image to ECR
@@ -42,7 +42,7 @@ jobs:
           ECR_REPOSITORY_URI: ${{ secrets.BACKEND_ECR_REPOSITORY_URI }}
         run: |
           docker build -t myrepo/backend:latest ./backend
-          docker tag suleimanmohammed/node-react-sample-code-backend:latest $ECR_REPOSITORY_URI:backend-latest
+          docker tag suleimanmohammed/node-react-sample-code-backend:latest $ECR_REPOSITORY_URI:backend:latest
           docker push $ECR_REPOSITORY_URI:backend-latest
 
       - name: Deploy to AWS ECS
