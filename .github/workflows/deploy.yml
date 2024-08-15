@@ -32,7 +32,7 @@ jobs:
           AWS_REGION: ${{ secrets.AWS_REGION }}
           ECR_REPOSITORY_URI: ${{ secrets.FRONTEND_ECR_REPOSITORY_URI }}
         run: |
-          docker build -t myapp-frontend -f ./frontend/Dockerfile ./frontend
+          docker build -t myrepo/frontend:latest ./frontend
           docker tag myapp-frontend:latest $ECR_REPOSITORY_URI:frontend-latest
           docker push $ECR_REPOSITORY_URI:frontend-latest
 
@@ -41,7 +41,7 @@ jobs:
           AWS_REGION: ${{ secrets.AWS_REGION }}
           ECR_REPOSITORY_URI: ${{ secrets.BACKEND_ECR_REPOSITORY_URI }}
         run: |
-          docker build -t myapp-backend -f ./backend/Dockerfile ./backend
+          docker build -t myrepo/backend:latest ./backend
           docker tag myapp-backend:latest $ECR_REPOSITORY_URI:backend-latest
           docker push $ECR_REPOSITORY_URI:backend-latest
 
