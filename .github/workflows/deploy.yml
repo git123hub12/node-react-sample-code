@@ -1,4 +1,4 @@
-name: Deploy to AWS Dev Server
+name: Deploy to AWS Master Server
 
 on:
   push:
@@ -28,24 +28,12 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
-      - name: Debug AWS Environment
-        run: |
-          echo "AWS Region: ${{ secrets.AWS_REGION }}"
-          echo "AWS Access Key ID: ${{ secrets.AWS_ACCESS_KEY_ID }}"
-        env:
-          AWS_REGION: ${{ secrets.AWS_REGION }}
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-
       - name: Log in to Amazon ECR
         run: |
           aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.ECR_REGISTRY_URI }}
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-
-      - name: List files in directory (for debugging)
-        run: ls -la
 
       - name: Build and Push Frontend Docker Image to ECR
         run: |
@@ -69,7 +57,7 @@ jobs:
 
       - name: Deploy to AWS ECS
         run: |
-          aws ecs update-service --cluster Doc-Cluster --service Task-1 --force-new-deployment --region ${{ secrets.AWS_REGION }}
+          aws ecs update-service master-cluster ${{ secrets.ECS_CLUSTER_NAME }} master-task ${{ secrets.ECS_SERVICE_NAME }} --force-new-deployment --region ${{ secrets.AWS_REGION }}
         env:
           AWS_REGION: ${{ secrets.AWS_REGION }}
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
